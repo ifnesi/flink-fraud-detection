@@ -1,0 +1,7 @@
+.venv
+.DS_Store
+
+config/*
+!config/example.ini
+
+notes.txt

@@ -1,0 +1,16 @@
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+#map {
+  height: 100vh;
+  width: 100%;
+}
+
+#logs {
+  font-family: monospace;
+  font-size: 13px;
+  color: #ebecec;
+}
