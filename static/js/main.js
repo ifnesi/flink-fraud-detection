@@ -107,7 +107,7 @@ $(document).ready(function(){
             <b>Event #${events_counter}: ${timestamp.replace("T", " ").replace("Z", "")}</b><br>
             - Transaction ID: ${transactionId}<br>
             - User ID: ${userId}<br>
-            - Amount: $${amount.toFixed(2)}<br>
+            - Amount: $ ${formatNumber(amount)}<br>
             - Lat: ${lat.toFixed(7)}<br>
             - Lng: ${lng.toFixed(7)}`).openPopup();
         setTimeout(() => { marker.closePopup(); }, 4000);
@@ -130,7 +130,7 @@ $(document).ready(function(){
         .then(response => response.json())
         .then(data => {
             appendLog(`
-                <b>Event #${events_counter} [${userId}]</b>:<br>
+                <span style="text-decoration:underline;"><b>Event #${events_counter} [${userId}]</b></span>:<br>
                 - timestamp: ${timestamp.replace("T", " ").replace("Z", "")}<br>
                 - transaction_id: ${transactionId}<br>
                 - amount: $ ${formatNumber(amount)}<br>
