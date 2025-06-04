@@ -5,3 +5,7 @@ config/*
 !config/example.ini
 
 notes.txt
+.env
+
+.terraform*
+terraform*
