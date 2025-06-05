@@ -84,7 +84,7 @@ class KafkaApp:
         )
 
         # Get AVRO schema
-        with open(os.path.join("schemas", "transactions.avro"), "r") as f:
+        with open(os.path.join("schemas", "fraud_detection.avro"), "r") as f:
             value_schema = json.loads(f.read())
 
         # Schema Registry

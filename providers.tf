@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "confluent" {
-  # Environment variables to be set on ./env_credentials.sh (see README.md)
+  # Environment variables to be set on ./env (see README.md)
   #CONFLUENT_CLOUD_API_KEY    = "XXXXX"
   #CONFLUENT_CLOUD_API_SECRET = "XXXXX"
 }
