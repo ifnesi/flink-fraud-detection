@@ -59,8 +59,8 @@ data "confluent_schema_registry_cluster" "cc_sr_cluster" {
     resource.confluent_kafka_cluster.cc_kafka_cluster
   ]
 }
-output "cc_sr_cluster_id" {
-  value = data.confluent_schema_registry_cluster.cc_sr_cluster
+output "cc_sr_cluster_endpoint" {
+  value = data.confluent_schema_registry_cluster.cc_sr_cluster.rest_endpoint
 }
 
 # --------------------------------------------------------

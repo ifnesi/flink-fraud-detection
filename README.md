@@ -10,6 +10,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
+deactivate
 ```
 
 ```sh
@@ -26,6 +27,14 @@ source .env
 terraform plan
 terraform apply --auto-approve
 terraform output -json > tf_aws_data.json
+./set_config.sh
+```
+
+```sh
+source .venv/bin/activate
+python3 app.py --config ./config/tf_config.ini --dummy 250
+deactivate
+
 ```
 
 ![image](docs/london-paris.png)

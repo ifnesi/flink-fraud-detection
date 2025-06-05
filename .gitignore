@@ -2,7 +2,7 @@
 .DS_Store
 
 config/*
-!config/example.ini
+!config/template.ini
 
 notes.txt
 .env
