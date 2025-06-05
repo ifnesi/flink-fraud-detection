@@ -9,3 +9,4 @@ notes.txt
 
 .terraform*
 terraform*
+tf_aws_data.json
