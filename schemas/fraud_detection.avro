@@ -1,6 +1,6 @@
 {
-  "namespace": "fraud_demo",
-  "name": "transactions",
+  "namespace": "cc_demo",
+  "name": "fraud_detection",
   "type": "record",
   "doc": "user_id is the topic key",
   "fields": [

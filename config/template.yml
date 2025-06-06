@@ -1,0 +1,47 @@
+kafka:
+  bootstrap.servers: $cc_kafka_cluster_bootstrap
+  security.protocol: SASL_SSL
+  sasl.mechanisms: PLAIN
+  sasl.username: $clients_kafka_cluster_key
+  sasl.password: $clients_kafka_cluster_secret
+
+kafka-producer:
+  client.id: producer-fraud-detection-demo
+
+kafka-consumer:
+  group.id: consumer-fraud-detection-demo
+  isolation.level: read_uncommitted
+  auto.offset.reset: earliest
+  enable.auto.commit: true
+
+schema-registry:
+  url: $cc_sr_cluster_endpoint
+  basic.auth.user.info: $sr_cluster_key:$sr_cluster_secret
+
+kafka-others:
+  fraud_detection.topic:
+    name: fraud-detection
+    schema: ./schemas/fraud_detection.avro
+  fraud_detection_config.topic:
+    name: fraud-detection-config
+    schema: ./schemas/fraud_detection_config.avro
+  fraud_detection_enriched.topic:
+    name: fraud-detection-enriched
+
+users:
+  user_1:
+    first_name: Lena
+    last_name: Whitaker
+    max_speed: 10
+  user_2:
+    first_name: Elias
+    last_name: Monroe
+    max_speed: 100
+  user_3:
+    first_name: Nina
+    last_name: Langston
+    max_speed: 1000
+  user_4:
+    first_name: Jordan
+    last_name: Blake
+    max_speed: 99999

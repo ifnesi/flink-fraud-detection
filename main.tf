@@ -238,6 +238,7 @@ resource "confluent_api_key" "flink_api_key" {
 # --------------------------------------------------------
 # Kafka topics/schema
 # --------------------------------------------------------
+# fraud_detection 
 resource "confluent_kafka_topic" "fraud_detection" {
   kafka_cluster {
     id = confluent_kafka_cluster.cc_kafka_cluster.id
@@ -258,7 +259,6 @@ resource "confluent_kafka_topic" "fraud_detection" {
     prevent_destroy = false
   }
 }
-
 resource "confluent_schema" "avro-fraud_detection" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.cc_sr_cluster.id
@@ -267,6 +267,43 @@ resource "confluent_schema" "avro-fraud_detection" {
   subject_name = "fraud-detection-value"
   format = "AVRO"
   schema = file("./schemas/fraud_detection.avro")
+  credentials {
+    key    = confluent_api_key.sr_cluster_key.id
+    secret = confluent_api_key.sr_cluster_key.secret
+  }
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+# fraud_detection_config
+resource "confluent_kafka_topic" "fraud_detection_config" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.cc_kafka_cluster.id
+  }
+  topic_name         = "fraud-detection-config"
+  rest_endpoint      = confluent_kafka_cluster.cc_kafka_cluster.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app_manager_kafka_cluster_key.id
+    secret = confluent_api_key.app_manager_kafka_cluster_key.secret
+  }
+  partitions_count = 1
+  config = {
+    "cleanup.policy" = "compact"
+    "min.insync.replicas" = "2"
+    "retention.ms" = "-1" # Infinite retention
+  }
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+resource "confluent_schema" "avro-fraud_detection_config" {
+  schema_registry_cluster {
+    id = data.confluent_schema_registry_cluster.cc_sr_cluster.id
+  }
+  rest_endpoint = data.confluent_schema_registry_cluster.cc_sr_cluster.rest_endpoint
+  subject_name = "fraud-detection-config-value"
+  format = "AVRO"
+  schema = file("./schemas/fraud_detection_config.avro")
   credentials {
     key    = confluent_api_key.sr_cluster_key.id
     secret = confluent_api_key.sr_cluster_key.secret

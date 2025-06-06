@@ -2,7 +2,7 @@
 .DS_Store
 
 config/*
-!config/template.ini
+!config/template.yml
 
 notes.txt
 .env
@@ -10,3 +10,5 @@ notes.txt
 .terraform*
 terraform*
 tf_aws_data.json
+
+*.pyc
