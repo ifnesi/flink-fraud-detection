@@ -13,6 +13,15 @@ function formatNumber(num, decimals = 2) {
   return num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+function hashStringToInt(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i); // hash * 31 + char
+        hash |= 0; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
+}
+
 // Events counter
 var events_counter = 0;
 
@@ -25,26 +34,32 @@ $(document).ready(function(){
     });
 
     // Custom markers
-    const customIcons = {
-        user_001: L.icon({
+    const customIcons = [
+        L.icon({
             iconUrl: '/static/img/pin-red.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
         }),
-        user_002: L.icon({
+        L.icon({
             iconUrl: '/static/img/pin-magenta.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
         }),
-        user_003: L.icon({
+        L.icon({
             iconUrl: '/static/img/pin-blue.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
         }),
-    }
+        L.icon({
+            iconUrl: '/static/img/pin-green.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        }),
+    ]
 
     // WebSockets data handling
     const socket = io();
@@ -65,18 +80,20 @@ $(document).ready(function(){
     socket.on("kafka_message", (msg) => {
         const ct = msg.current_transaction_id;
         const pt = msg.previous_transaction_id;
+        const max_speed = msg.max_speed;
         const speed = msg.speed_kmph;
+        const user_name = msg.first_name + " " + msg.last_name;
         var status;
         var color;
-        if (speed > 200) {
-            status = "FRAUD";
+        if (speed > max_speed) {
+            status = "FRAUD: Max speed exceeded";
             color = "danger"
         }
         else {
             status = "VALID";
             color = "success"
         }
-        appendLog(`<span class="badge bg-${color} w-100 text-start" style="font-size:14px;">[<b>${status}</b>] ${pt} => ${ct}: <b>${formatNumber(Math.abs(speed))} Km/h</b></span><hr class="m-1">`);
+        appendLog(`<span class="badge bg-${color} w-100 text-start" style="font-size:14px;">[<b>${status}</b>]<br>&#9656; ${user_name}<br>&#9656; ${pt} => ${ct}<br>&#9656; ${formatNumber(speed)} Km/h (Max: ${max_speed} Km/h)</b></span><hr class="m-1">`);
     });
 
     // Load OpenStreetMap tiles
@@ -102,7 +119,7 @@ $(document).ready(function(){
         events_counter++;
 
         // Drop a marker at clicked point
-        const marker = L.marker([lat, lng], { icon: customIcons[userId] }).addTo(map);
+        const marker = L.marker([lat, lng], { icon: customIcons[hashStringToInt(userId) % customIcons.length] }).addTo(map);
         marker.bindPopup(`
             <b>Event #${events_counter}: ${timestamp.replace("T", " ").replace("Z", "")}</b><br>
             - Transaction ID: ${transactionId}<br>

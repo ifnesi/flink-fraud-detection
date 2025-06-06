@@ -67,7 +67,10 @@ if __name__ == "__main__":
     # Flask Routing
     @flask.app.route("/")
     def index():
-        return render_template("index.html")
+        return render_template(
+            "index.html",
+            users=kafka_app.users,
+        )
 
     @flask.app.route("/submit-event", methods=["POST"])
     def submit_coordinates():

@@ -10,6 +10,9 @@ CREATE TABLE `fraud-detection-enriched` (
   `previous_lat` DOUBLE,
   `previous_lng` DOUBLE,
   `previous_amount` DOUBLE,
+  `first_name` STRING,
+  `last_name` STRING,
+  `max_speed` DOUBLE,
   `speed_kmph` DOUBLE,
   WATERMARK FOR `current_timestamp` AS `current_timestamp`
 ) DISTRIBUTED INTO 1 BUCKETS
