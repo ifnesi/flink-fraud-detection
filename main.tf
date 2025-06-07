@@ -346,7 +346,7 @@ resource "confluent_flink_statement" "alter_card_transactions_enriched" {
   principal {
     id = confluent_service_account.app_manager.id
   }
-  statement = file("./sql/alter-table_card-transactions-enriched.sql")
+  statement = file("./sql/alter-table_card-transactions.sql")
   properties = {
     "sql.current-catalog"  = resource.confluent_environment.cc_demo_env.id
     "sql.current-database" = resource.confluent_kafka_cluster.cc_kafka_cluster.id

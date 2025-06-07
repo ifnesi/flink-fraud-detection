@@ -70,7 +70,7 @@ deactivate
 
 Before provisioning resources with Terraform, you need to create a Confluent Cloud API Key with permissions to manage:
  - Environment
- - Kafka cluster, topics and client API keys
+ - Kafka cluster, topics, service accounts, RBACs and client API keys
  - Schema Registry and AVRO schemas
  - Flink compute pool and SQL statements
 
@@ -109,6 +109,10 @@ What these commands do:
 
 ⚠️ Note: Provisioning can take a few minutes depending on service availability and quota limits.
 
+After provisioning resources via Terraform, a Confluent Cloud environment named `env-demo-card-transactions-XXXXXXXX` (where `XXXXXXXX` are random hexadecimal characters) will be created. Within this environment, a BASIC Kafka cluster named `cc-demo-main` is set up, containing the topics: `card-transactions`, `card-transactions-enriched`, and `users-config`. Additionally, a Flink compute pool called `standard_compute_pool` with 5 CFUs is provisioned. The setup also includes the creation of necessary service accounts, RBAC roles, and API keys to securely manage and operate the infrastructure.
+
+The FLink SQL Fraud detection application outputs the data product to the topic `card-transactions-enriched`. The complete SQL statement can be found at the file [./sql/insert_card-transactions-enriched.sql](https://github.com/ifnesi/flink-fraud-detection/blob/main/sql/insert_card-transactions-enriched.sql).
+
  The Python consumer in this demo is configured with the Kafka setting `isolation.level: read_uncommitted`. This is because Confluent Cloud's Apache Flink writes to Kafka using transactions that are committed only during checkpointing. By default, in Confluent Cloud, Flink performs checkpoints every 60 seconds. During this time, uncommitted transactional messages are visible only if the consumer’s isolation level allows it.
  - The Confluent Cloud Web UI does not use `read_committed` isolation, meaning it reads all messages regardless of transaction state.
  - The Python consumer must use `read_uncommitted` to avoid waiting for Kafka transaction commits during processing.
@@ -140,7 +144,7 @@ python3 app.py -h
 
 ### Fraud Detection Web Application
 
-The Fraud Detection Python/Flask application runs locally and is accessible at [http://localhost:8888](http://localhost:8888). Use the dropdown menu to select a user, then double-click anywhere on the map and enter a transaction amount to simulate a credit card transaction at that location. After a pin on the map is shown, repeat the process at a different location. The application will quickly analyse the transaction by calculating the travel speed between the two points and comparing it to the customer’s configured maximum speed. It will then indicate whether the transaction is valid or fraudulent based on this speed check.
+The Fraud Detection Python/Flask application runs locally and is accessible at [http://localhost:8888](http://localhost:8888). Use the dropdown menu to select a user, then double-click anywhere on the map and enter a transaction amount to simulate a credit card transaction at that location (the event will be produced to the topic `card-transactions`). After a pin on the map is shown, repeat the process at a different location. The application will quickly analyse the transaction by calculating the travel speed between the two points and comparing it to the customer’s configured maximum speed (and output to the topic `card-transactions-enriched`). It will then indicate whether the transaction is valid or fraudulent based on this speed check.
 
 ![image](docs/app-main.png)
 
