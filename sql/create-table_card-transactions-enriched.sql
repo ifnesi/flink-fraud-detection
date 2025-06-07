@@ -1,4 +1,4 @@
-CREATE TABLE `fraud-detection-enriched` (
+CREATE TABLE `card-transactions-enriched` (
   `key` STRING PRIMARY KEY NOT ENFORCED,
   `current_timestamp` TIMESTAMP_LTZ(3),
   `current_transaction_id` STRING,
@@ -13,7 +13,7 @@ CREATE TABLE `fraud-detection-enriched` (
   `first_name` STRING,
   `last_name` STRING,
   `max_speed` DOUBLE,
-  `speed_kmph` DOUBLE,
+  `speed` DOUBLE,
   WATERMARK FOR `current_timestamp` AS `current_timestamp`
 ) DISTRIBUTED INTO 1 BUCKETS
 WITH (

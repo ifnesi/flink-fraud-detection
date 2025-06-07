@@ -1,5 +1,5 @@
-INSERT INTO `fraud-detection-enriched`
-WITH `fraud-detection-paired` AS (
+INSERT INTO `card-transactions-enriched`
+WITH `card-transactions-paired` AS (
     SELECT
         `key`,
         decode(key, 'utf-8') AS user_id,
@@ -13,7 +13,7 @@ WITH `fraud-detection-paired` AS (
         LAG(lat, 1) OVER (PARTITION BY key ORDER BY $rowtime) AS previous_lat,
         LAG(lng, 1) OVER (PARTITION BY key ORDER BY $rowtime) AS previous_lng,
         LAG(amount, 1) OVER (PARTITION BY key ORDER BY $rowtime) AS previous_amount
-    FROM `fraud-detection`
+    FROM `card-transactions`
     WHERE transaction_id IS NOT NULL
 )
 SELECT
@@ -38,7 +38,7 @@ SELECT
             COS(RADIANS(fd.previous_lat)) * COS(RADIANS(fd.current_lat)) *
             POWER(SIN(RADIANS(fd.current_lng - fd.previous_lng) / 2), 2)
         )
-    )) / ((fd.`current_timestamp` - fd.`previous_timestamp`) / 3600000.0) AS speed_kph
-FROM `fraud-detection-paired` AS fd
-LEFT JOIN `fraud-detection-config` AS fdc ON fd.`key` = fdc.`key`
+    )) / ((fd.`current_timestamp` - fd.`previous_timestamp`) / 3600000.0) AS speed
+FROM `card-transactions-paired` AS fd
+LEFT JOIN `users-config` AS fdc ON fd.`key` = fdc.`key`
 WHERE previous_timestamp IS NOT NULL;

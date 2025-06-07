@@ -81,7 +81,7 @@ $(document).ready(function(){
         const ct = msg.current_transaction_id;
         const pt = msg.previous_transaction_id;
         const max_speed = msg.max_speed;
-        const speed = msg.speed_kmph;
+        const speed = msg.speed;
         const user_name = msg.first_name + " " + msg.last_name;
         var status;
         var color;

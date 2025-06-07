@@ -52,14 +52,14 @@ class KafkaApp:
             config = yaml.safe_load(f.read())
 
         # Kafka topics
-        self.fraud_detection_topic = config["kafka-others"]["fraud_detection.topic"][
+        self.card_transactions_topic = config["kafka-others"]["card_transactions.topic"][
             "name"
         ]
-        self.fraud_detection_config_topic = config["kafka-others"][
-            "fraud_detection_config.topic"
+        self.users_config_topic = config["kafka-others"][
+            "users_config.topic"
         ]["name"]
-        self.fraud_detection_enriched_topic = config["kafka-others"][
-            "fraud_detection_enriched.topic"
+        self.card_transactions_enriched_topic = config["kafka-others"][
+            "card_transactions_enriched.topic"
         ]["name"]
 
         # Configure Kafka producer
@@ -85,9 +85,9 @@ class KafkaApp:
         conf_schema_registry = dict(config["schema-registry"])
         self.schema_registry = SchemaRegistryClient(conf_schema_registry)
 
-        # fraud_detection
+        # card_transactions
         ## Avro SerDes
-        with open(config["kafka-others"]["fraud_detection.topic"]["schema"], "r") as f:
+        with open(config["kafka-others"]["card_transactions.topic"]["schema"], "r") as f:
             value_schema = json.loads(f.read())
         self.avro_serializer_fd = AvroSerializer(
             self.schema_registry,
@@ -97,10 +97,10 @@ class KafkaApp:
             self.schema_registry,
         )
 
-        # fraud_detection_config
+        # users_config
         ## Avro Ser
         with open(
-            config["kafka-others"]["fraud_detection_config.topic"]["schema"], "r"
+            config["kafka-others"]["users_config.topic"]["schema"], "r"
         ) as f:
             value_schema = json.loads(f.read())
         self.avro_serializer_fdc = AvroSerializer(
@@ -125,7 +125,7 @@ class KafkaApp:
             }
             for i in range(args.dummy_records):
                 self.submit_event(
-                    self.fraud_detection_topic,
+                    self.card_transactions_topic,
                     user_id_dummy,
                     message_dummy,
                     self.avro_serializer_fd,
@@ -143,7 +143,7 @@ class KafkaApp:
                     "max_speed": value["max_speed"],
                 }
                 self.submit_event(
-                    self.fraud_detection_config_topic,
+                    self.users_config_topic,
                     key,
                     message,
                     self.avro_serializer_fdc,
@@ -176,9 +176,9 @@ class KafkaApp:
 
     def kafka_consumer_thread(self):
         """Consume Kafka messages and push/websock it to the front-end"""
-        self.consumer.subscribe([self.fraud_detection_enriched_topic])
+        self.consumer.subscribe([self.card_transactions_enriched_topic])
         logging.info(
-            f"Consumer `{self.conf_consumer['group.id']}` subscribed to topic: {self.fraud_detection_enriched_topic}"
+            f"Consumer `{self.conf_consumer['group.id']}` subscribed to topic: {self.card_transactions_enriched_topic}"
         )
 
         try:

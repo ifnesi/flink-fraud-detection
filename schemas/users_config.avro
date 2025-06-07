@@ -1,6 +1,6 @@
 {
   "namespace": "cc_demo",
-  "name": "fraud_detection_config",
+  "name": "users_config",
   "type": "record",
   "doc": "user_id is the topic key",
   "fields": [

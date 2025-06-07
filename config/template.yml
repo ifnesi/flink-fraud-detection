@@ -6,10 +6,10 @@ kafka:
   sasl.password: $clients_kafka_cluster_secret
 
 kafka-producer:
-  client.id: producer-fraud-detection-demo
+  client.id: producer-card-transactions-demo
 
 kafka-consumer:
-  group.id: consumer-fraud-detection-demo
+  group.id: consumer-card-transactions-demo
   isolation.level: read_uncommitted
   auto.offset.reset: earliest
   enable.auto.commit: true
@@ -19,14 +19,14 @@ schema-registry:
   basic.auth.user.info: $sr_cluster_key:$sr_cluster_secret
 
 kafka-others:
-  fraud_detection.topic:
-    name: fraud-detection
-    schema: ./schemas/fraud_detection.avro
-  fraud_detection_config.topic:
-    name: fraud-detection-config
-    schema: ./schemas/fraud_detection_config.avro
-  fraud_detection_enriched.topic:
-    name: fraud-detection-enriched
+  card_transactions.topic:
+    name: card-transactions
+    schema: ./schemas/card_transactions.avro
+  users_config.topic:
+    name: users-config
+    schema: ./schemas/users_config.avro
+  card_transactions_enriched.topic:
+    name: card-transactions-enriched
 
 users:
   user_1:

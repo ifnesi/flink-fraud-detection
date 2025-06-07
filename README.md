@@ -1,11 +1,34 @@
 ![image](docs/confluent-logo.png)
 
-# flink-fraud-detection
-Real-Time Fraud Detection using Confluent Cloud for Flink
+# Real-Time Fraud Detection using Confluent Cloud for Flink
 
-THIS IS A WORK IN PROGRESS!!!
 
-Initial Setup
+
+## Overview
+
+![image](docs/diagram.png)
+
+## Pre-requisites
+- User account on [Confluent Cloud](https://www.confluent.io/confluent-cloud/tryfree)
+- Local install of [Terraform](https://www.terraform.io)
+- Local install of [jq](https://jqlang.github.io/jq/download)
+
+## Installation (only need to do that once)
+
+### Install Terraform
+```shell
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+brew update
+brew upgrade hashicorp/tap/terraform
+```
+
+### Install jq
+```shell
+brew install jq
+```
+
+### Python setup
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
@@ -14,7 +37,7 @@ pip install -r requirements.txt
 deactivate
 ```
 
-Create the env file
+### Set environment variables
 ```sh
 cat > ./.env <<EOF
 #!/bin/bash
@@ -23,7 +46,7 @@ export CONFLUENT_CLOUD_API_SECRET="<CONFLUENT_CLOUD_API_SECRET>"
 EOF
 ```
 
-Provision Confluent Cloud resources (Terraform)
+### Provision Confluent Cloud resources (Terraform)
 ```sh
 terraform init
 source .env
@@ -33,20 +56,19 @@ terraform output -json > tf_aws_data.json
 ./set_config.sh
 ```
 
-Start Web application
+### Start Web application
 ```sh
 source .venv/bin/activate
 python3 app.py --config ./config/tf_config.yml --users --dummy 250
-deactivate
 ```
 
-Delete Confluent Cloud resources (Terraform)
-```sh
-terraform apply --auto-approve
-```
-
-![image](docs/london-paris.png)
 ![image](docs/app-main.png)
+
+### Delete Confluent Cloud resources (Terraform)
+```sh
+deactivate
+terraform destroy --auto-approve
+```
 
 ## External References
 Check out [Confluent's Developer portal](https://developer.confluent.io), it has free courses, documents, articles, blogs, podcasts and so many more content to get you up and running with a fully managed Apache Kafka service.

@@ -238,12 +238,12 @@ resource "confluent_api_key" "flink_api_key" {
 # --------------------------------------------------------
 # Kafka topics/schema
 # --------------------------------------------------------
-# fraud_detection 
-resource "confluent_kafka_topic" "fraud_detection" {
+# card_transactions 
+resource "confluent_kafka_topic" "card_transactions" {
   kafka_cluster {
     id = confluent_kafka_cluster.cc_kafka_cluster.id
   }
-  topic_name         = "fraud-detection"
+  topic_name         = "card-transactions"
   rest_endpoint      = confluent_kafka_cluster.cc_kafka_cluster.rest_endpoint
   credentials {
     key    = confluent_api_key.app_manager_kafka_cluster_key.id
@@ -259,14 +259,14 @@ resource "confluent_kafka_topic" "fraud_detection" {
     prevent_destroy = false
   }
 }
-resource "confluent_schema" "avro-fraud_detection" {
+resource "confluent_schema" "avro-card_transactions" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.cc_sr_cluster.id
   }
   rest_endpoint = data.confluent_schema_registry_cluster.cc_sr_cluster.rest_endpoint
-  subject_name = "fraud-detection-value"
+  subject_name = "card-transactions-value"
   format = "AVRO"
-  schema = file("./schemas/fraud_detection.avro")
+  schema = file("./schemas/card_transactions.avro")
   credentials {
     key    = confluent_api_key.sr_cluster_key.id
     secret = confluent_api_key.sr_cluster_key.secret
@@ -275,12 +275,12 @@ resource "confluent_schema" "avro-fraud_detection" {
     prevent_destroy = false
   }
 }
-# fraud_detection_config
-resource "confluent_kafka_topic" "fraud_detection_config" {
+# users_config
+resource "confluent_kafka_topic" "users_config" {
   kafka_cluster {
     id = confluent_kafka_cluster.cc_kafka_cluster.id
   }
-  topic_name         = "fraud-detection-config"
+  topic_name         = "users-config"
   rest_endpoint      = confluent_kafka_cluster.cc_kafka_cluster.rest_endpoint
   credentials {
     key    = confluent_api_key.app_manager_kafka_cluster_key.id
@@ -296,14 +296,14 @@ resource "confluent_kafka_topic" "fraud_detection_config" {
     prevent_destroy = false
   }
 }
-resource "confluent_schema" "avro-fraud_detection_config" {
+resource "confluent_schema" "avro-users_config" {
   schema_registry_cluster {
     id = data.confluent_schema_registry_cluster.cc_sr_cluster.id
   }
   rest_endpoint = data.confluent_schema_registry_cluster.cc_sr_cluster.rest_endpoint
-  subject_name = "fraud-detection-config-value"
+  subject_name = "users-config-value"
   format = "AVRO"
-  schema = file("./schemas/fraud_detection_config.avro")
+  schema = file("./schemas/users_config.avro")
   credentials {
     key    = confluent_api_key.sr_cluster_key.id
     secret = confluent_api_key.sr_cluster_key.secret
@@ -333,7 +333,7 @@ data "confluent_flink_region" "flink_region" {
 # --------------------------------------------------------
 # Flink Statements
 # --------------------------------------------------------
-resource "confluent_flink_statement" "alter_fraud_detection_enriched" {
+resource "confluent_flink_statement" "alter_card_transactions_enriched" {
   organization {
     id = data.confluent_organization.cc_org.id
   }
@@ -346,7 +346,7 @@ resource "confluent_flink_statement" "alter_fraud_detection_enriched" {
   principal {
     id = confluent_service_account.app_manager.id
   }
-  statement = file("./sql/alter-table_fraud-detection-enriched.sql")
+  statement = file("./sql/alter-table_card-transactions-enriched.sql")
   properties = {
     "sql.current-catalog"  = resource.confluent_environment.cc_demo_env.id
     "sql.current-database" = resource.confluent_kafka_cluster.cc_kafka_cluster.id
@@ -361,11 +361,11 @@ resource "confluent_flink_statement" "alter_fraud_detection_enriched" {
   }
   depends_on = [
     confluent_flink_compute_pool.flink_compute_pool,
-    confluent_kafka_topic.fraud_detection
+    confluent_kafka_topic.card_transactions
   ]
 }
 
-resource "confluent_flink_statement" "create_table_fraud_detection_enriched" {
+resource "confluent_flink_statement" "create_table_card_transactions_enriched" {
   organization {
     id = data.confluent_organization.cc_org.id
   }
@@ -378,7 +378,7 @@ resource "confluent_flink_statement" "create_table_fraud_detection_enriched" {
   principal {
     id = confluent_service_account.app_manager.id
   }
-  statement = file("./sql/create-table_fraud-detection-enriched.sql")
+  statement = file("./sql/create-table_card-transactions-enriched.sql")
   properties = {
     "sql.current-catalog"  = resource.confluent_environment.cc_demo_env.id
     "sql.current-database" = resource.confluent_kafka_cluster.cc_kafka_cluster.id
@@ -393,11 +393,11 @@ resource "confluent_flink_statement" "create_table_fraud_detection_enriched" {
   }
   depends_on = [
     confluent_flink_compute_pool.flink_compute_pool,
-    confluent_flink_statement.alter_fraud_detection_enriched
+    confluent_flink_statement.alter_card_transactions_enriched
   ]
 }
 
-resource "confluent_flink_statement" "insert_fraud_detection_enriched" {
+resource "confluent_flink_statement" "insert_card_transactions_enriched" {
   organization {
     id = data.confluent_organization.cc_org.id
   }
@@ -410,7 +410,7 @@ resource "confluent_flink_statement" "insert_fraud_detection_enriched" {
   principal {
     id = confluent_service_account.app_manager.id
   }
-  statement = file("./sql/insert_fraud-detection-enriched.sql")
+  statement = file("./sql/insert_card-transactions-enriched.sql")
   properties = {
     "sql.current-catalog"  = resource.confluent_environment.cc_demo_env.id
     "sql.current-database" = resource.confluent_kafka_cluster.cc_kafka_cluster.id
@@ -425,6 +425,6 @@ resource "confluent_flink_statement" "insert_fraud_detection_enriched" {
   }
   depends_on = [
     confluent_flink_compute_pool.flink_compute_pool,
-    confluent_flink_statement.create_table_fraud_detection_enriched
+    confluent_flink_statement.create_table_card_transactions_enriched
   ]
 }

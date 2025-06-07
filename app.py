@@ -87,7 +87,7 @@ if __name__ == "__main__":
             "timestamp": int(dt.timestamp() * 1000),
         }
         kafka_app.submit_event(
-            kafka_app.fraud_detection_topic,
+            kafka_app.card_transactions_topic,
             user_id,
             message,
             kafka_app.avro_serializer_fd,
