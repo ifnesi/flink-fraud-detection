@@ -6,7 +6,7 @@
 
 This demo showcases a fraud detection use case leveraging Confluent Cloud's Apache Kafka and Apache Flink. In this scenario, credit card transactions are streamed in real-time into Confluent Cloud, where Apache Flink processes them to identify suspicious patterns as they happen. The resulting real-time fraud detection data product is made available to various downstream consumers, including fraud detection systems, customer service teams, and point-of-sale (PoS) applications, which can immediately act—for example, by blocking a fraudulent transaction before it completes. Simultaneously, enriched and verified data is persisted into a data lake using [Confluent Tableflow](https://docs.confluent.io/cloud/current/topics/tableflow/overview.html), ensuring that both real-time insights and historical analysis are supported.
 
-## Overview
+## Demo Overview
 
 This demo emulates credit card transactions occurring globally, simulating real-time financial activity across various geolocations. Built on an event-driven data architecture, each transaction is represented as an event containing the following key attributes: `user_id`, `timestamp`, `transaction_id`, `amount`, and `GPS coordinates`. These events are streamed into Confluent Cloud, forming the backbone of a dynamic, low-latency pipeline for fraud detection analysis.
 
@@ -17,6 +17,29 @@ A Flink SQL streaming application processes these incoming events by correlating
 This example illustrates just one of many possible fraud detection dimensions enabled by the power of event-driven architectures and real-time stream processing with Flink.
 
 ![image](docs/diagram.png)
+
+## Relevance of the Demo in Real-Life
+
+While this demo focuses on detecting physically improbable transactions by calculating travel speed between two points, the broader architectural pattern it demonstrates is highly relevant to real-world fraud detection, both for in-person and online transactions.
+
+In real-life systems, fraud detection spans multiple dimensions beyond just geospatial analysis. Here are some practical techniques that can be implemented using the same event-driven, real-time approach:
+
+🧠 Behavioral and Pattern-Based Analysis
+ - Velocity checks: Flagging multiple transactions from the same card in a short time span.
+ - Average spend deviation: Identifying transactions that deviate significantly from a user’s historical spending patterns.
+ - Time-of-day anomalies: Catching activity that occurs at unusual times for the user (e.g., transactions at 3 AM).
+
+🌐 Online-Specific Fraud Detection
+ - IP address and geolocation mismatches: Identifying logins or purchases from new or high-risk regions.
+ - Device fingerprinting: Detecting rapid device switching or unknown device usage.
+ - Use of anonymous networks: Blocking or flagging transactions originating from VPNs, proxies, or Tor.
+
+🔁 Profile-Based Scoring and Real-Time Rules
+ - Maintain stateful aggregates of user behavior using Flink (e.g., rolling averages, session patterns).
+ - Enrich each event with historical data and evaluate against fraud rules in real time.
+ - Optionally, integrate machine learning models for dynamic fraud scoring.
+
+Ultimately, this demo is designed to showcase how technologies like Apache Kafka and Apache Flink can be leveraged to build flexible, scalable, and real-time fraud detection systems. While it focuses on one specific detection strategy, the same architecture can be extended to support any number of fraud dimensions, from transaction anomalies and behavioral modeling to location-based alerts and predictive scoring.
 
 ## Pre-requisites
 Before running this demo, ensure you have the following tools and accounts set up:
@@ -166,6 +189,9 @@ terraform destroy --auto-approve
 ```
 
 ## External References
+
+Apache®, Apache Kafka®, Kafka®, Apache Flink®, Flink®, and the associated Flink and Kafka logos are trademarks of Apache Software Foundation.
+
 Check out [Confluent's Developer portal](https://developer.confluent.io), it has free courses, documents, articles, blogs, podcasts and so many more content to get you up and running with a fully managed Apache Kafka service.
 
 Disclaimer: I work for Confluent :wink:
