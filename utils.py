@@ -134,7 +134,7 @@ class KafkaApp:
         # Upsert users
         self.users = dict()
         for key, value in config["users"].items():
-            self.users[key] = value["first_name"] + " " + value["last_name"]
+            self.users[key] = f"""{value["first_name"]} {value["last_name"]} (Max {value["max_speed"]:,.0f} Km/h)"""
         if args.users:
             for key, value in config["users"].items():
                 message = {

@@ -40,7 +40,7 @@
             <label for="userIdSelect" class="small mb-0 text-white text-nowrap">Select User:</label>
             <select class="form-select form-select-sm flex-grow-1 bg-secondary-subtle" id="userIdSelect">
             {% for user_id, user_name in users.items() %}
-                <option value="{{ user_id }}">{{ user_name }} ({{ user_id }})</option>
+                <option value="{{ user_id }}">{{ user_id }}: {{ user_name }}</option>
             {% endfor %}
             </select>
         </div>
