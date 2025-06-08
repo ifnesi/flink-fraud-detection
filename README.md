@@ -136,6 +136,8 @@ What these commands do:
 
 ⚠️ Note: Provisioning can take a few minutes depending on service availability and quota limits.
 
+💡 Note: If `./set_config.sh` fails or you are running the script on Windows, you can manually create the configuration file. Copy `./config/template.yml` to `./config/tf_config.yml` and replace the placeholder variables (prefixed with `$`) with their corresponding values from the `./tf_aws_data.json` file.
+
 After provisioning resources via Terraform, a Confluent Cloud environment named `env-demo-card-transactions-XXXXXXXX` (where `XXXXXXXX` are random hexadecimal characters) will be created. Within this environment, a BASIC Kafka cluster named `cc-demo-main` is set up, containing the topics: `card-transactions`, `card-transactions-enriched`, and `users-config`. Additionally, a Flink compute pool called `standard_compute_pool` with 5 CFUs is provisioned. The setup also includes the creation of necessary service accounts, RBAC roles, and API keys to securely manage and operate the infrastructure.
 
 The FLink SQL Fraud detection application outputs the data product to the topic `card-transactions-enriched`. The complete SQL statement can be found at the file [./sql/insert_card-transactions-enriched.sql](https://github.com/ifnesi/flink-fraud-detection/blob/main/sql/insert_card-transactions-enriched.sql).
