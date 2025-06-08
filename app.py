@@ -34,13 +34,14 @@ if __name__ == "__main__":
         )
         parser.add_argument(
             "--config",
-            help="Path to the config file",
+            help="Path to the config file (default: ./config/tf_config.yml)",
             dest="config",
             type=str,
+            default="./config/tf_config.yml",
         )
         parser.add_argument(
             "--dummy",
-            help="Generate dummy records",
+            help="Generate dummy records (default: 0)",
             dest="dummy_records",
             type=int,
             default=0,
