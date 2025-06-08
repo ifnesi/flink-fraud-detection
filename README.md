@@ -175,7 +175,9 @@ python3 app.py -h
 
 The Fraud Detection Python/Flask application runs locally and is accessible at [http://localhost:8888](http://localhost:8888). Use the dropdown menu to select a user, then double-click anywhere on the map and enter a transaction amount to simulate a credit card transaction at that location (the event will be produced to the topic `card-transactions`). After a pin on the map is shown, repeat the process at a different location. The application will quickly analyse the transaction by calculating the travel speed between the two points and comparing it to the customer’s configured maximum speed (and output to the topic `card-transactions-enriched`). It will then indicate whether the transaction is valid or fraudulent based on this speed check.
 
-Here are high-level diagram of the end-to-end solution:
+Below is a high-level diagram of the end-to-end solution. For simplicity, the demo uses a Python producer to write user configuration data directly into Apache Kafka. In a production environment, this data would typically originate from a database and be ingested using one of Confluent’s Change Data Capture (CDC) source connectors. CDC enables seamless, real-time integration of database changes into Kafka topics.
+
+👉 Learn more about CDC and its use cases here: https://www.confluent.io/learn/change-data-capture/
 
 ![image](docs/diagram-details.png)
 
