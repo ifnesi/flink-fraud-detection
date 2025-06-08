@@ -43,7 +43,7 @@ Ultimately, this demo is designed to showcase how technologies like Apache Kafka
 
 ## Pre-requisites
 Before running this demo, ensure you have the following tools and accounts set up:
- - A [Confluent Cloud](https://www.confluent.io/confluent-cloud/tryfree). You can sign up for a free trial here. This is required to provision the fully managed Kafka and Flink resources used in the demo.
+ - A [Confluent Cloud](https://www.confluent.io/confluent-cloud/tryfree) account. You can sign up for a free trial. This is required to provision the fully managed Kafka and Flink resources used in the demo.
  - A local installation of [Terraform](https://www.terraform.io). Terraform is used to automate the provisioning of Confluent Cloud infrastructure (Kafka topics, Flink SQL pipelines, etc.).
  - A local installation of [jq](https://jqlang.github.io/jq/download). This lightweight command-line JSON processor is used to parse API responses and handle configuration variables during setup.
  - [Python +3.9](https://www.python.org/downloads/) installed locally. Python is used to run the transaction simulator script, which generates and sends credit card transaction events into the data streaming pipeline.
