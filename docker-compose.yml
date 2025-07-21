@@ -1,0 +1,113 @@
+services:
+
+  postgres:
+    image: debezium/postgres:$POSTGRES_VERSION
+    platform: linux/x86_64
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+    ports:
+      - 5432:5432
+    volumes:
+      - ./sql/postgres_users_config.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+       - ./volumes/pgadmin:/var/lib/pgadmin
+    ports:
+      - 5050:80
+    restart: always
+    depends_on:
+      - postgres
+
+  connect:
+    image: confluentinc/cp-kafka-connect:$CONFLUENT_PLATFORM_VERSION
+    hostname: connect
+    container_name: connect
+    ports:
+      - 8083:8083
+    environment:
+      # Confluent Cloud Kafka settings
+      CONNECT_BOOTSTRAP_SERVERS: $cc_kafka_cluster_bootstrap
+      CONNECT_SECURITY_PROTOCOL: SASL_SSL
+      CONNECT_SASL_MECHANISM: PLAIN
+      CONNECT_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="$clients_kafka_cluster_key" password="$clients_kafka_cluster_secret";'
+
+      # Kafka Connect configs
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
+
+      # Converters
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: $cc_sr_cluster_endpoint
+      CONNECT_VALUE_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE: USER_INFO
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO: $sr_cluster_key:$sr_cluster_secret
+
+      # Monitoring (optional)
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-$CONFLUENT_PLATFORM_VERSION.jar
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor
+
+      # Plugin paths
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+
+    volumes:
+      - ./connect-plugins:/usr/share/confluent-hub-components
+
+    command:
+      - bash
+      - -c
+      - |
+        echo "Installing Debezium SQL Server connector..."
+        confluent-hub install --no-prompt debezium/debezium-connector-postgresql:latest
+        echo "Starting Kafka Connect worker"
+        /etc/confluent/docker/run &
+
+        echo "Waiting for Kafka Connect REST API to be ready..."
+        while ! curl -s http://localhost:8083/connectors >/dev/null; do
+          sleep 2
+        done
+
+        echo "Kafka Connect is ready. Creating connector..."
+
+        curl -X PUT http://localhost:8083/connectors/postgres-cdc-source/config \
+          -H "Content-Type: application/json" \
+          -d '{
+            "name": "postgres-cdc-source",
+            "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+            "plugin.name": "pgoutput",
+            "database.hostname": "postgres",
+            "database.port": "5432",
+            "database.user": "postgres",
+            "database.password": "postgres",
+            "database.dbname": "postgres",
+            "snapshot.mode": "initial",
+            "table.include.list": "public.users_config",
+            "topic.prefix": "postgres",
+            "tasks.max": "1"
+          }'
+
+        echo "Connector created. Holding container..."
+        sleep infinity
+
+    restart: always
+    depends_on:
+      - postgres
+      - pgadmin

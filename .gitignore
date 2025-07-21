@@ -12,3 +12,6 @@ terraform*
 tf_aws_data.json
 
 *.pyc
+
+connect-plugins
+volumes/pgadmin/sessions
