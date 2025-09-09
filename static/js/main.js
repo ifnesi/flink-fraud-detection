@@ -1,18 +1,28 @@
+// GLOBAL VARS
+// Events counter
+var events_counter = 0;
+// Previous marker for each user
+var previous_markers = {};
+
+//////////////////////
 function generateRandomId(length = 12) {
   const array = new Uint8Array(length / 2);
   crypto.getRandomValues(array);
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('').slice(0, length);
 }
 
+//////////////////////
 function appendLog(logMessage) {
     $('#logs').append(logMessage);
     $('#logs').scrollTop($('#logs')[0].scrollHeight);
 }
 
+//////////////////////
 function formatNumber(num, decimals = 2) {
   return num.toFixed(decimals).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+//////////////////////
 function hashStringToInt(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -22,9 +32,7 @@ function hashStringToInt(str) {
     return Math.abs(hash);
 }
 
-// Events counter
-var events_counter = 0;
-
+//////////////////////
 $(document).ready(function(){
     // Initialize map centered around M25 near London
     const map = L.map('map', {
@@ -34,30 +42,31 @@ $(document).ready(function(){
     });
 
     // Custom markers
+    const lineColors = ['red', 'magenta', 'blue', 'green'];
     const customIcons = [
         L.icon({
             iconUrl: '/static/img/pin-red.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
+            popupAnchor: [0, -32],
         }),
         L.icon({
             iconUrl: '/static/img/pin-magenta.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
+            popupAnchor: [0, -32],
         }),
         L.icon({
             iconUrl: '/static/img/pin-blue.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
+            popupAnchor: [0, -32],
         }),
         L.icon({
             iconUrl: '/static/img/pin-green.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
+            popupAnchor: [0, -32],
         }),
     ]
 
@@ -119,7 +128,8 @@ $(document).ready(function(){
         events_counter++;
 
         // Drop a marker at clicked point
-        const marker = L.marker([lat, lng], { icon: customIcons[hashStringToInt(userId) % customIcons.length] }).addTo(map);
+        const iconId = hashStringToInt(userId) % customIcons.length;
+        const marker = L.marker([lat, lng], { icon: customIcons[iconId] }).addTo(map);
         marker.bindPopup(`
             <b>Event #${events_counter}: ${timestamp.replace("T", " ").replace("Z", "")}</b><br>
             - Transaction ID: ${transactionId}<br>
@@ -128,6 +138,15 @@ $(document).ready(function(){
             - Lat: ${lat.toFixed(7)}<br>
             - Lng: ${lng.toFixed(7)}`).openPopup();
         setTimeout(() => { marker.closePopup(); }, 4000);
+
+        // Draw a line from previous marker to current
+        if (userId in previous_markers) {
+            const prevMarker = previous_markers[userId];
+            const latlngs = [prevMarker.getLatLng(), marker.getLatLng()];
+            L.polyline(latlngs, {color: lineColors[iconId]}).addTo(map);
+        }
+        // Set current marker for the current user
+        previous_markers[userId] = marker;
 
         // POST coordinates to server
         fetch('/submit-event', {
