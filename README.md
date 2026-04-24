@@ -176,7 +176,7 @@ cd ..
 
 This command starts the Confluent Platform services, including Kafka/KRaft (one broker/controller), Confluent Schema Registry, Confluent Control Center, Confluent REST Proxy, and Confluent Flink.
 
-Confluent Control Center will be available at `http://localhost:9021` and Confluent Flink's Job Manager at `http://localhost:9081`.
+Confluent Control Center will be available at [http://localhost:90219021](http://localhost:8888) and Confluent Flink's Job Manager at [http://localhost:9081](http://localhost:9081).
 
 ### Step 2 - Start the Fraud Detection Web Application
 
