@@ -5,6 +5,22 @@
 
 set -e
 
+# Function to open URL in default browser (cross-platform)
+open_browser() {
+    if command -v open > /dev/null; then
+        # macOS
+        open "$1"
+    elif command -v xdg-open > /dev/null; then
+        # Linux
+        xdg-open "$1"
+    elif command -v start > /dev/null; then
+        # Windows (Git Bash)
+        start "$1"
+    else
+        echo "⚠️  Could not detect browser command. Please open manually: $1"
+    fi
+}
+
 echo "=========================================="
 echo "Starting Confluent Cloud Fraud Detection Demo"
 echo "=========================================="
@@ -80,11 +96,23 @@ echo ""
 source .venv/bin/activate
 cd src
 
-echo "Starting web application with..."
+echo "Starting web application with 250 dummy records..."
 echo ""
 echo "The application will be available at: http://localhost:8888"
 echo ""
+
+# Open browser tabs
+echo "🌐 Opening browser tabs..."
+sleep 2
+
+# Open Confluent Cloud Console
+open_browser "https://confluent.cloud/login" &
+
+echo ""
 echo "Press CTRL-C to stop the application"
 echo ""
+
+# Open Fraud Detection App
+open_browser "http://localhost:8888" &
 
 python3 app.py --config ./config/tf_config.yml --users --dummy 250
