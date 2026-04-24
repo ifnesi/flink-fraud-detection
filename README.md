@@ -43,12 +43,12 @@ Ultimately, this demo is designed to showcase how technologies like Apache Kafka
 
 ## Pre-requisites
 Before running this demo, ensure you have the following tools and accounts set up:
- - [jq](https://jqlang.github.io/jq/download). This lightweight command-line JSON processor is used to parse API responses and handle configuration variables during setup.
  - [Python +3.9](https://www.python.org/downloads/). Python is used to run the transaction simulator script, which generates and sends credit card transaction events into the data streaming pipeline.
 
 ### If running this demo on Confluent Cloud
  - A [Confluent Cloud](https://www.confluent.io/confluent-cloud/tryfree) account. You can sign up for a free trial. This is required to provision the fully managed Kafka and Flink resources used in the demo.
  - [Terraform](https://www.terraform.io). Terraform is used to automate the provisioning of Confluent Cloud infrastructure (Kafka topics, Flink SQL pipelines, etc.).
+ - [jq](https://jqlang.github.io/jq/download). This lightweight command-line JSON processor is used to parse API responses and handle configuration variables during setup.
 
  ### If running this demo on Confluent Platform
  - [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/). Docker is used to run the transaction simulator in a containerized environment.
@@ -178,7 +178,7 @@ This command starts the Confluent Platform services, including Kafka/KRaft (one 
 
 Confluent Control Center will be available at `http://localhost:9021` and Confluent Flink's Job Manager at `http://localhost:9081`.
 
-### Step 3 - Start the Fraud Detection Web Application
+### Step 2 - Start the Fraud Detection Web Application
 
 Activate the Python virtual environment and run the web application with the desired options:
 
@@ -202,7 +202,7 @@ You can see the full help message anytime by running:
 python3 app.py -h
 ```
 
-### Fraud Detection Web Application
+## Fraud Detection Web Application
 
 The Fraud Detection Python/Flask application runs locally and is accessible at [http://localhost:8888](http://localhost:8888). Use the dropdown menu to select a user, then double-click anywhere on the map and enter a transaction amount to simulate a credit card transaction at that location (the event will be produced to the topic `card-transactions`). After a pin on the map is shown, repeat the process at a different location. The application will quickly analyse the transaction by calculating the travel speed between the two points and comparing it to the customer's configured maximum speed (and output to the topic `card-transactions-enriched`). It will then indicate whether the transaction is valid or fraudulent based on this speed check.
 
@@ -220,7 +220,7 @@ Snapshop of the web application:
 
 To stop the web application, press `CTRL-C` in the terminal where it's running.
 
-### Delete Confluent Cloud resources (Terraform)
+## Delete Confluent Cloud resources (Terraform)
 
 After you have finished the demo and testing, you can delete all provisioned resources to avoid incurring costs:
 
@@ -235,7 +235,7 @@ What these commands do:
 - `deactivate`: exits the Python virtual environment if active.
 - `terraform destroy --auto-approve`: destroys all resources created by Terraform without asking for confirmation.
 
-### Delete Confluent Platform resources (Docker)
+## Delete Confluent Platform resources (Docker)
 
 After you have finished the demo and testing, you can stop the Confluent Platform Docker container:
 
