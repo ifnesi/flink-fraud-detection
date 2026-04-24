@@ -77,9 +77,27 @@ deactivate
 
 ## Running the demo on Confluent Cloud
 
-Follow the steps below to run the demo on Confluent Cloud.
+### Quick Start (Recommended)
 
-### Step 1 - Set environment variables
+The easiest way to start the demo is using the provided shell script:
+
+```sh
+./start_cc.sh
+```
+
+This script will:
+- Check prerequisites (Python virtual environment and .env file)
+- Provision Confluent Cloud resources using Terraform
+- Generate the configuration file
+- Start the Fraud Detection web application
+
+⚠️ **Important**: Before running the script, make sure you have completed the [Installation](#installation-one-time-setup) steps and created the `./terraform/.env` file with your Confluent Cloud API credentials (see [Step 1](#step-1---set-environment-variables-manual) below).
+
+### Manual Steps (Alternative)
+
+If you prefer to run the steps manually or need more control over the process, follow the steps below.
+
+#### Step 1 - Set environment variables (Manual)
 
 Before provisioning resources with Terraform, you need to create a Confluent Cloud API Key with permissions to manage:
  - Environment
@@ -97,7 +115,7 @@ export CONFLUENT_CLOUD_API_SECRET="<YOUR_CONFLUENT_CLOUD_API_SECRET_HERE>"
 EOF
 ```
 
-### Step 2 - Provision Confluent Cloud resources (Terraform)
+#### Step 2 - Provision Confluent Cloud resources (Terraform - Manual)
 
 With all tools installed and environment variables set, you can now provision the required Confluent Cloud infrastructure using Terraform.
 
@@ -136,7 +154,7 @@ The Flink SQL Fraud detection application outputs the data product to the topic 
 
 For customers requiring lower latency, the Flink checkpoint interval can be reduced (for example, to 10 seconds), allowing transactional commits, and thus visibility of new data, to occur more frequently.
 
-### Step 3 - Start the Fraud Detection Web Application
+#### Step 3 - Start the Fraud Detection Web Application (Manual)
 
 Activate the Python virtual environment and run the web application with the desired options:
 
@@ -162,9 +180,27 @@ python3 app.py -h
 
 ## Running the demo on Confluent Platform (via Docker)
 
-Follow the steps below to run the demo on Confluent Platform using Docker. This is useful for testing and development, especially if you don't have access to Confluent Cloud.
+### Quick Start (Recommended)
 
-### Step 1 - Start the Confluent Platform Docker Container
+The easiest way to start the demo is using the provided shell script:
+
+```sh
+./start_cp.sh
+```
+
+This script will:
+- Check prerequisites (Python virtual environment and Docker)
+- Start Confluent Platform Docker containers
+- Wait for services to be ready
+- Start the Fraud Detection web application
+
+⚠️ **Important**: Before running the script, make sure you have completed the [Installation](#installation-one-time-setup) steps and Docker is running.
+
+### Manual Steps (Alternative)
+
+If you prefer to run the steps manually or need more control over the process, follow the steps below.
+
+#### Step 1 - Start the Confluent Platform Docker Container (Manual)
 
 Run the Confluent Platform Docker container with the necessary services:
 
@@ -178,7 +214,7 @@ This command starts the Confluent Platform services, including Kafka/KRaft (one 
 
 Confluent Control Center will be available at [http://localhost:9021](http://localhost:9021) and Confluent Flink's Job Manager at [http://localhost:9081](http://localhost:9081).
 
-### Step 2 - Start the Fraud Detection Web Application
+#### Step 2 - Start the Fraud Detection Web Application (Manual)
 
 Activate the Python virtual environment and run the web application with the desired options:
 
@@ -220,31 +256,69 @@ Snapshop of the web application:
 
 To stop the web application, press `CTRL-C` in the terminal where it's running.
 
-## Delete Confluent Cloud resources (Terraform)
+## Stopping the Demo
 
-After you have finished the demo and testing, you can delete all provisioned resources to avoid incurring costs:
+### Stop Confluent Cloud Demo
+
+#### Quick Stop (Recommended)
+
+The easiest way to stop the demo and clean up resources is using the provided shell script:
+
+```sh
+./stop_cc.sh
+```
+
+This script will:
+- Deactivate the Python virtual environment (if active)
+- Destroy all Confluent Cloud resources using Terraform
+
+⚠️ **Important**: This will permanently delete all provisioned resources to avoid incurring costs.
+
+#### Manual Steps (Alternative)
+
+If you prefer to run the steps manually, follow these commands:
 
 ```sh
 deactivate
-cd ../terraform
+cd terraform
+source .env
 terraform destroy --auto-approve
 cd ..
 ```
 
 What these commands do:
 - `deactivate`: exits the Python virtual environment if active.
+- `source .env`: loads your API credentials for Terraform.
 - `terraform destroy --auto-approve`: destroys all resources created by Terraform without asking for confirmation.
 
-## Delete Confluent Platform resources (Docker)
+### Stop Confluent Platform Demo
 
-After you have finished the demo and testing, you can stop the Confluent Platform Docker container:
+#### Quick Stop (Recommended)
+
+The easiest way to stop the demo is using the provided shell script:
+
+```sh
+./stop_cp.sh
+```
+
+This script will:
+- Deactivate the Python virtual environment (if active)
+- Stop all Confluent Platform Docker containers
+
+#### Manual Steps (Alternative)
+
+If you prefer to run the steps manually, follow these commands:
 
 ```sh
 deactivate
-cd ../docker
+cd docker
 docker compose down
 cd ..
 ```
+
+What these commands do:
+- `deactivate`: exits the Python virtual environment if active.
+- `docker compose down`: stops and removes all Docker containers.
 
 ## External References
 
