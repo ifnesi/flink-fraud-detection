@@ -1,0 +1,45 @@
+kafka:
+  bootstrap.servers: localhost:9092
+  security.protocol: PLAINTEXT
+  sasl.mechanisms: PLAIN
+
+kafka-producer:
+  client.id: producer-card-transactions-demo
+
+kafka-consumer:
+  group.id: consumer-card-transactions-demo
+  isolation.level: read_uncommitted
+  auto.offset.reset: earliest
+  enable.auto.commit: true
+
+schema-registry:
+  url: http://localhost:8081
+
+kafka-others:
+  card_transactions.topic:
+    name: card-transactions
+    schema: ./schemas/card_transactions.avro
+  users_config.topic:
+    name: users-config
+    schema: ./schemas/users_config.avro
+  card_transactions_enriched.topic:
+    name: card-transactions-enriched
+
+users:
+  user_1:
+    first_name: Lena
+    last_name: Whitaker
+    max_speed: 10
+  user_2:
+    first_name: Elias
+    last_name: Monroe
+    max_speed: 100
+  user_3:
+    first_name: Nina
+    last_name: Langston
+    max_speed: 1000
+  user_4:
+    first_name: Jordan
+    last_name: Blake
+    max_speed: 99999
+

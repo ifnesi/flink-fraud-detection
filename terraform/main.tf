@@ -266,7 +266,7 @@ resource "confluent_schema" "avro-card_transactions" {
   rest_endpoint = data.confluent_schema_registry_cluster.cc_sr_cluster.rest_endpoint
   subject_name = "card-transactions-value"
   format = "AVRO"
-  schema = file("./schemas/card_transactions.avro")
+  schema = file("../src/schemas/card_transactions.avro")
   credentials {
     key    = confluent_api_key.sr_cluster_key.id
     secret = confluent_api_key.sr_cluster_key.secret
@@ -303,7 +303,7 @@ resource "confluent_schema" "avro-users_config" {
   rest_endpoint = data.confluent_schema_registry_cluster.cc_sr_cluster.rest_endpoint
   subject_name = "users-config-value"
   format = "AVRO"
-  schema = file("./schemas/users_config.avro")
+  schema = file("../src/schemas/users_config.avro")
   credentials {
     key    = confluent_api_key.sr_cluster_key.id
     secret = confluent_api_key.sr_cluster_key.secret

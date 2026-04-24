@@ -43,10 +43,15 @@ Ultimately, this demo is designed to showcase how technologies like Apache Kafka
 
 ## Pre-requisites
 Before running this demo, ensure you have the following tools and accounts set up:
- - A [Confluent Cloud](https://www.confluent.io/confluent-cloud/tryfree) account. You can sign up for a free trial. This is required to provision the fully managed Kafka and Flink resources used in the demo.
- - [Terraform](https://www.terraform.io). Terraform is used to automate the provisioning of Confluent Cloud infrastructure (Kafka topics, Flink SQL pipelines, etc.).
  - [jq](https://jqlang.github.io/jq/download). This lightweight command-line JSON processor is used to parse API responses and handle configuration variables during setup.
  - [Python +3.9](https://www.python.org/downloads/). Python is used to run the transaction simulator script, which generates and sends credit card transaction events into the data streaming pipeline.
+
+### If running this demo on Confluent Cloud
+ - A [Confluent Cloud](https://www.confluent.io/confluent-cloud/tryfree) account. You can sign up for a free trial. This is required to provision the fully managed Kafka and Flink resources used in the demo.
+ - [Terraform](https://www.terraform.io). Terraform is used to automate the provisioning of Confluent Cloud infrastructure (Kafka topics, Flink SQL pipelines, etc.).
+
+ ### If running this demo on Confluent Platform
+ - [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/). Docker is used to run the transaction simulator in a containerized environment.
 
 Make sure all tools are properly installed and available in your system's PATH.
 
@@ -56,29 +61,6 @@ Make sure all tools are properly installed and available in your system's PATH.
 
 These steps only need to be completed once to prepare your local environment for running the demo.
 
-### Install Terraform
-
-If you're using macOS with Homebrew, install Terraform with the following commands:
-
-```shell
-brew tap hashicorp/tap
-brew install hashicorp/tap/terraform
-brew update
-brew upgrade hashicorp/tap/terraform
-```
-
-📌 Note: You can verify the installation by running terraform -version.
-
-### Install jq
-
-Install jq, a lightweight command-line JSON processor:
-
-```shell
-brew install jq
-```
-
-📌 Note: You can verify the installation with jq --version.
-
 ### Python setup
 
 After downloading and installing Python +3.9, set up a virtual Python environment and install required dependencies:
@@ -87,13 +69,17 @@ After downloading and installing Python +3.9, set up a virtual Python environmen
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r src/requirements.txt
 deactivate
 ```
 
 📌 Note: Activating the virtual environment is only needed when running Python scripts (e.g., the transaction generator).
 
-### Set environment variables
+## Running the demo on Confluent Cloud
+
+Follow the steps below to run the demo on Confluent Cloud.
+
+### Step 1 - Set environment variables
 
 Before provisioning resources with Terraform, you need to create a Confluent Cloud API Key with permissions to manage:
  - Environment
@@ -104,26 +90,28 @@ Before provisioning resources with Terraform, you need to create a Confluent Clo
 Once you've created the API key in the Confluent Cloud Console, set your environment variables by creating a `.env` file, make sure to have the placeholders replaced by the appropriate values:
 
 ```sh
-cat > ./.env <<EOF
+cat > ./terraform/.env <<EOF
 #!/bin/bash
 export CONFLUENT_CLOUD_API_KEY="<YOUR_CONFLUENT_CLOUD_API_KEY_HERE>"
 export CONFLUENT_CLOUD_API_SECRET="<YOUR_CONFLUENT_CLOUD_API_SECRET_HERE>"
 EOF
 ```
 
-### Provision Confluent Cloud resources (Terraform)
+### Step 2 - Provision Confluent Cloud resources (Terraform)
 
 With all tools installed and environment variables set, you can now provision the required Confluent Cloud infrastructure using Terraform.
 
 Run the following commands:
 
 ```sh
+cd terraform
 terraform init
 source .env
 terraform plan
 terraform apply --auto-approve
 terraform output -json > tf_aws_data.json
 ./set_config.sh
+cd ..
 ```
 
 What these commands do:
@@ -132,11 +120,11 @@ What these commands do:
  - `terraform plan`: Shows the execution plan of resources to be created.
  - `terraform apply --auto-approve`: Provisions the resources in Confluent Cloud without manual confirmation.
  - `terraform output -json > tf_aws_data.json`: Exports the output variables from Terraform into a local JSON file.
- - `./set_config.sh`: Generates a local configuration file (`./config/tf_config.yml`) with required credentials and endpoint information for the fraud detection web application.
+ - `./set_config.sh`: Generates a local configuration file (`../src/config/tf_config.yml`) with required credentials and endpoint information for the fraud detection web application.
 
 ⚠️ Note: Provisioning can take a few minutes depending on service availability and quota limits.
 
-💡 Note: If `./set_config.sh` fails or you are running the script on Windows, you can manually create the configuration file. Copy `./config/template.yml` to `./config/tf_config.yml` and replace the placeholder variables (prefixed with `$`) with their corresponding values from the `./tf_aws_data.json` file.
+💡 Note: If `./set_config.sh` fails or you are running the script on Windows, you can manually create the configuration file. Copy `../src/config/template.yml` to `../src/config/tf_config.yml` and replace the placeholder variables (prefixed with `$`) with their corresponding values from the `./tf_aws_data.json` file.
 
 After provisioning resources via Terraform, a Confluent Cloud environment named `env-demo-card-transactions-XXXXXXXX` (where `XXXXXXXX` are random hexadecimal characters) will be created. Within this environment, a BASIC Kafka cluster named `cc-demo-main` is set up, containing the topics: `card-transactions`, `card-transactions-enriched`, and `users-config`. Additionally, a Flink compute pool called `standard_compute_pool` with 5 CFUs is provisioned. The setup also includes the creation of necessary service accounts, RBAC roles, and API keys to securely manage and operate the infrastructure.
 
@@ -148,13 +136,56 @@ The Flink SQL Fraud detection application outputs the data product to the topic 
 
 For customers requiring lower latency, the Flink checkpoint interval can be reduced (for example, to 10 seconds), allowing transactional commits, and thus visibility of new data, to occur more frequently.
 
-### Start the Fraud Detection Web Application
+### Step 3 - Start the Fraud Detection Web Application
 
 Activate the Python virtual environment and run the web application with the desired options:
 
 ```sh
 source .venv/bin/activate
+cd src
 python3 app.py --config ./config/tf_config.yml --users --dummy 250
+```
+
+Explanation of the command options:
+ - `--config` CONFIG_FILE
+Path to the configuration file generated during provisioning (default: ./config/tf_config.yml).
+ - `--dummy` DUMMY_RECORDS
+Generate the specified number of dummy transaction records for testing (e.g., 250). Since this demo starts with an empty Kafka topic, Flink requires at least this many records to process and emit meaningful results using the over function.
+ - `--users`
+Upsert (create/update) users based on the configuration file.
+
+You can see the full help message anytime by running:
+
+```sh
+python3 app.py -h
+```
+
+## Running the demo on Confluent Platform (via Docker)
+
+Follow the steps below to run the demo on Confluent Platform using Docker. This is useful for testing and development, especially if you don't have access to Confluent Cloud.
+
+### Step 1 - Start the Confluent Platform Docker Container
+
+Run the Confluent Platform Docker container with the necessary services:
+
+```sh
+cd docker
+docker compose up -d
+cd ..
+```
+
+This command starts the Confluent Platform services, including Kafka/KRaft (one broker/controller), Confluent Schema Registry, Confluent Control Center, Confluent REST Proxy, and Confluent Flink.
+
+Confluent Control Center will be available at `http://localhost:9021` and Confluent Flink's Job Manager at `http://localhost:9081`.
+
+### Step 3 - Start the Fraud Detection Web Application
+
+Activate the Python virtual environment and run the web application with the desired options:
+
+```sh
+source .venv/bin/activate
+cd src
+python3 app.py --config ./config/docker.yml --users --dummy 250
 ```
 
 Explanation of the command options:
@@ -195,12 +226,25 @@ After you have finished the demo and testing, you can delete all provisioned res
 
 ```sh
 deactivate
+cd ../terraform
 terraform destroy --auto-approve
+cd ..
 ```
 
 What these commands do:
 - `deactivate`: exits the Python virtual environment if active.
 - `terraform destroy --auto-approve`: destroys all resources created by Terraform without asking for confirmation.
+
+### Delete Confluent Platform resources (Docker)
+
+After you have finished the demo and testing, you can stop the Confluent Platform Docker container:
+
+```sh
+deactivate
+cd ../docker
+docker compose down
+cd ..
+```
 
 ## External References
 

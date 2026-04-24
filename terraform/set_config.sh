@@ -1,8 +1,8 @@
 #!/bin/bash
 
 JSON_FILE="tf_aws_data.json"
-TEMPLATE_FILE="./config/template.yml"
-OUTPUT_FILE="./config/tf_config.yml"
+TEMPLATE_FILE="../src/config/template.yml"
+OUTPUT_FILE="../src/config/tf_config.yml"
 
 IFS= # unset IFS to preserve line breaks
 read -r -d '' OUTPUT < "$TEMPLATE_FILE"

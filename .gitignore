@@ -1,14 +1,15 @@
 .venv
 .DS_Store
 
-config/*
-!config/template.yml
+src/config/*
+!src/config/template.yml
+!src/config/docker.yml
 
 notes.txt
-.env
+terraform/.env
 
 .terraform*
-terraform*
+terraform.*
 tf_aws_data.json
 
 *.pyc

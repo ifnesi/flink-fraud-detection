@@ -25,7 +25,7 @@ variable "cc_cloud_region" {
 
 variable "cc_env_name" {
   type    = string
-  default = "env-demo-card-transactions"
+  default = "env-demo-fraud-detection"
 }
 
 variable "cc_cluster_name" {
