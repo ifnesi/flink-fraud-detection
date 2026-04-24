@@ -34,6 +34,7 @@ kafka-topics --bootstrap-server broker:29092 \
 kafka-topics --bootstrap-server broker:29092 \
     --create --if-not-exists \
     --topic users-config \
+    --config cleanup.policy=compact \
     --partitions 1 \
     --replication-factor 1
 kafka-topics --bootstrap-server broker:29092 \
