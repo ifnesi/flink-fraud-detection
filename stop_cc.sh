@@ -29,7 +29,7 @@ fi
 # Deactivate virtual environment if active
 if [[ "$VIRTUAL_ENV" != "" ]]; then
     echo "Deactivating Python virtual environment..."
-    deactivate
+    deactivate 2>/dev/null || true
 fi
 
 # Destroy Confluent Cloud resources
