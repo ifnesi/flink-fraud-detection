@@ -8,11 +8,11 @@ This demo showcases a fraud detection use case leveraging Confluent Cloud's Apac
 
 ## Demo Overview
 
-This demo emulates credit card transactions occurring globally, simulating real-time financial activity across various geolocations. Built on an event-driven data architecture, each transaction is represented as an event containing the following key attributes: `user_id`, `timestamp`, `transaction_id`, `amount`, and `GPS coordinates`. These events are streamed into Confluent Cloud, forming the backbone of a dynamic, low-latency pipeline for fraud detection analysis.
+This demo emulates credit card transactions occurring globally, simulating real-time financial activity across different geolocations. Built on an event-driven data architecture, each transaction is represented as an event containing the following key attributes: `user_id`, `timestamp`, `transaction_id`, `amount`, and `GPS coordinates`. These events are streamed into Confluent Cloud, forming the backbone of a dynamic, low-latency pipeline for fraud detection analysis.
 
 There are multiple established approaches to detecting fraudulent transactions, such as analysing credit scores, monitoring average spending within defined time windows, detecting unusual merchant categories, flagging sudden spikes in transaction volume, identifying atypical transaction locations, and even behavioral biometrics like typing speed or device fingerprinting. This demo focuses on one dimension, leveraging real-time geospatial and temporal correlation to detect anomalies in transaction speed.
 
-A Flink SQL streaming application processes these incoming events by correlating each transaction with the user's previous transaction. By means of leveraging the timestamp and GPS coordinates, the application calculates the implied travel speed between the two transactions. This speed is then enriched with additional customer metadata, including the user's name and a configured maximum allowable speed. If the derived speed exceeds the allowed threshold, indicating that a transaction likely could not have occurred based on physical constraints, the system flags it as potentially fraudulent. The resulting fraud detection data product is made available in real time to a web-based fraud detection application, enabling immediate visibility and action.
+A Flink SQL streaming application processes these incoming events by correlating each transaction with the user's previous transaction. By means of leveraging the timestamp and GPS coordinates, the application calculates the implied travel speed between the two transactions. This speed is then enriched with additional customer metadata, including the user's name and a configured maximum allowable speed. If the calculated speed exceeds the allowed threshold, indicating that a transaction likely could not have occurred based on physical constraints, the system flags it as potentially fraudulent. The resulting fraud detection data product is made available in real time to a web-based fraud detection application, enabling immediate visibility and action.
 
 This example illustrates just one of many possible fraud detection dimensions enabled by the power of event-driven architectures and real-time stream processing with Flink.
 
@@ -51,7 +51,7 @@ Before running this demo, ensure you have the following tools and accounts set u
  - [jq](https://jqlang.github.io/jq/download). This lightweight command-line JSON processor is used to parse API responses and handle configuration variables during setup.
 
  ### If running this demo on Confluent Platform
- - [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/). Docker is used to run the transaction simulator in a containerized environment.
+ - [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/). Docker is used to run Confluent Platform in a containerized environment.
 
 Make sure all tools are properly installed and available in your system's PATH.
 
