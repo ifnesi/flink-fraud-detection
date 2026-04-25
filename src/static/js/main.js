@@ -72,6 +72,91 @@ function toggleFullscreen() {
 }
 
 //////////////////////
+function showAmountModal() {
+    return new Promise((resolve, reject) => {
+        const modal = $('#amountModal');
+        const input = $('#amountInput');
+        const submitBtn = $('#submitAmount');
+        const cancelBtn = $('#cancelAmount');
+        const closeBtn = $('#closeAmountModal');
+        
+        // Reset input
+        input.val('');
+        submitBtn.prop('disabled', true);
+        
+        // Show modal
+        modal.addClass('show');
+        
+        // Focus input after animation
+        setTimeout(() => input.focus(), 100);
+        
+        // Input validation
+        input.off('input').on('input', function() {
+            const value = $(this).val();
+            // Allow only numbers and one decimal point
+            const validPattern = /^\d*\.?\d*$/;
+            
+            if (!validPattern.test(value)) {
+                // Remove invalid characters
+                $(this).val(value.slice(0, -1));
+                return;
+            }
+            
+            // Enable/disable submit button
+            const amount = parseFloat(value);
+            submitBtn.prop('disabled', !value || isNaN(amount) || amount <= 0);
+        });
+        
+        // Handle submit
+        const handleSubmit = () => {
+            const value = input.val();
+            const amount = parseFloat(value);
+            
+            if (!isNaN(amount) && amount > 0) {
+                modal.removeClass('show');
+                resolve(amount);
+                cleanup();
+            }
+        };
+        
+        // Handle cancel/close
+        const handleCancel = () => {
+            modal.removeClass('show');
+            reject(new Error('User cancelled'));
+            cleanup();
+        };
+        
+        // Cleanup function
+        const cleanup = () => {
+            submitBtn.off('click', handleSubmit);
+            cancelBtn.off('click', handleCancel);
+            closeBtn.off('click', handleCancel);
+            input.off('keypress');
+            $(document).off('keydown.amountModal');
+        };
+        
+        // Event listeners
+        submitBtn.on('click', handleSubmit);
+        cancelBtn.on('click', handleCancel);
+        closeBtn.on('click', handleCancel);
+        
+        // Enter key to submit
+        input.on('keypress', function(e) {
+            if (e.which === 13 && !submitBtn.prop('disabled')) {
+                handleSubmit();
+            }
+        });
+        
+        // ESC key to cancel
+        $(document).on('keydown.amountModal', function(e) {
+            if (e.key === 'Escape') {
+                handleCancel();
+            }
+        });
+    });
+}
+
+//////////////////////
 $(document).ready(function(){
     // Initialize map centered around M25 near London
     map = L.map('map', {
@@ -174,12 +259,13 @@ $(document).ready(function(){
     }).addTo(map);
 
     // Map double-click event
-    map.on('dblclick', function(e) {
-        // Prompt user for amount
-        const amountStr = prompt("Enter Transaction Amount ($):");
-        const amount = parseFloat(amountStr);
-        if (isNaN(amount)) {
-            alert("Invalid amount entered.");
+    map.on('dblclick', async function(e) {
+        // Show modal to get amount
+        let amount;
+        try {
+            amount = await showAmountModal();
+        } catch (error) {
+            // User cancelled or closed modal
             return;
         }
 

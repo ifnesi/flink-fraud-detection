@@ -121,5 +121,28 @@
       </div>
     </div>
   </div>
+
+  <!-- Transaction Amount Modal -->
+  <div id="amountModal" class="amount-modal">
+    <div class="amount-modal-content">
+      <div class="amount-modal-header">
+        <span class="amount-modal-title">Enter Transaction Amount</span>
+        <button class="amount-modal-close" id="closeAmountModal">
+          <span>×</span>
+        </button>
+      </div>
+      <div class="amount-modal-body">
+        <div class="amount-input-group">
+          <span class="amount-currency">$</span>
+          <input type="text" id="amountInput" class="amount-input" placeholder="0.00" autocomplete="off">
+        </div>
+      </div>
+      <div class="amount-modal-footer">
+        <button class="amount-btn amount-btn-cancel" id="cancelAmount">Cancel</button>
+        <button class="amount-btn amount-btn-submit" id="submitAmount">Submit</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
